@@ -13,7 +13,7 @@ padding:40px;
 }
 
 .container{
-max-width:1000px;
+max-width:1100px;
 margin:auto;
 background:white;
 padding:25px;
@@ -26,10 +26,15 @@ text-align:center;
 margin-bottom:20px;
 }
 
-input,select,button{
+input,select,textarea,button{
 padding:10px;
 margin:5px;
 font-size:14px;
+}
+
+textarea{
+width:250px;
+height:40px;
 }
 
 button{
@@ -52,9 +57,10 @@ border-bottom:1px solid #ddd;
 text-align:left;
 }
 
-.high{color:red;font-weight:bold;}
-.medium{color:orange;}
-.low{color:green;}
+.completed{
+text-decoration:line-through;
+color:gray;
+}
 
 </style>
 
@@ -74,11 +80,7 @@ text-align:left;
 <option>Low</option>
 </select>
 
-<select id="status">
-<option>Pending</option>
-<option>In Progress</option>
-<option>Completed</option>
-</select>
+<input id="notes" placeholder="Notes">
 
 <button onclick="addTask()">Add Task</button>
 
@@ -86,9 +88,10 @@ text-align:left;
 
 <thead>
 <tr>
+<th>Done</th>
 <th>Task</th>
 <th>Priority</th>
-<th>Status</th>
+<th>Notes</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -103,21 +106,35 @@ text-align:left;
 
 let defaultTasks = [
 
-{task:"Leaflets distribution for first two weekends",priority:"High",status:"Pending"},
-{task:"Digital campaign planning (4-5L budget)",priority:"High",status:"Pending"},
-{task:"Portal listings (Magicbricks, 99acres)",priority:"High",status:"Pending"},
-{task:"Customer testimonial shoot with Dharmraj",priority:"Medium",status:"Pending"},
-{task:"Developer shoot arrangement mid-week",priority:"Medium",status:"Pending"},
-{task:"Referral scheme creatives (₹51,000 bonus)",priority:"High",status:"Pending"},
-{task:"Short reels videos (location, amenities, project highlights)",priority:"High",status:"Pending"},
-{task:"GMB listing SEO task for Phase 2",priority:"Medium",status:"Pending"},
-{task:"Search campaign (display network)",priority:"High",status:"Pending"},
-{task:"Influencer shortlist for sample flat shoot",priority:"Medium",status:"Pending"},
-{task:"BW app collaterals update (floor plans, renders)",priority:"High",status:"Pending"},
-{task:"Video templates for WhatsApp nurturing",priority:"Medium",status:"Pending"},
-{task:"YouTube branding walkthrough video",priority:"Medium",status:"Pending"},
-{task:"Drone shoot alignment",priority:"Medium",status:"Pending"},
-{task:"Weekly sales review alignment",priority:"Low",status:"Pending"}
+{task:"Leaflets distribution for first two weekends",priority:"High",notes:"Prepare circulation quotation",done:false},
+
+{task:"Digital campaign planning (4-5L budget)",priority:"High",notes:"Google & Meta ads",done:false},
+
+{task:"Portal listings (Magicbricks, 99acres)",priority:"High",notes:"Upload project details",done:false},
+
+{task:"Customer testimonial shoot with Dharmraj",priority:"Medium",notes:"Arrange client visit",done:false},
+
+{task:"Developer shoot arrangement mid-week",priority:"Medium",notes:"Confirm shoot schedule",done:false},
+
+{task:"Referral scheme creatives (₹51,000 bonus)",priority:"High",notes:"Design creatives",done:false},
+
+{task:"Short reels videos (location, amenities, project highlights)",priority:"High",notes:"Shoot & edit reels",done:false},
+
+{task:"GMB listing SEO task for Phase 2",priority:"Medium",notes:"SEO optimisation",done:false},
+
+{task:"Search campaign (display network)",priority:"High",notes:"Track lead quality",done:false},
+
+{task:"Influencer shortlist for sample flat shoot",priority:"Medium",notes:"Get commercials",done:false},
+
+{task:"BW app collaterals update (floor plans, renders)",priority:"High",notes:"Update mobile presenter",done:false},
+
+{task:"Video templates for WhatsApp nurturing",priority:"Medium",notes:"Create message templates",done:false},
+
+{task:"YouTube branding walkthrough video",priority:"Medium",notes:"Script walkthrough",done:false},
+
+{task:"Drone shoot alignment",priority:"Medium",notes:"Schedule location shoot",done:false},
+
+{task:"Weekly sales review alignment",priority:"Low",notes:"Internal review meeting",done:false}
 
 ];
 
@@ -141,10 +158,15 @@ tasks.forEach((t,index)=>{
 
 let row = document.createElement("tr");
 
+if(t.done){
+row.classList.add("completed");
+}
+
 row.innerHTML = `
+<td><input type="checkbox" ${t.done ? "checked" : ""} onchange="toggleDone(${index})"></td>
 <td>${t.task}</td>
 <td>${t.priority}</td>
-<td>${t.status}</td>
+<td>${t.notes}</td>
 <td><button onclick="deleteTask(${index})">Delete</button></td>
 `;
 
@@ -158,22 +180,37 @@ function addTask(){
 
 let task = document.getElementById("task").value;
 let priority = document.getElementById("priority").value;
-let status = document.getElementById("status").value;
+let notes = document.getElementById("notes").value;
 
 if(task==="") return;
 
-tasks.push({task,priority,status});
+tasks.push({
+task,
+priority,
+notes,
+done:false
+});
 
 saveTasks();
 renderTasks();
 
 document.getElementById("task").value="";
+document.getElementById("notes").value="";
 
 }
 
 function deleteTask(index){
 
 tasks.splice(index,1);
+
+saveTasks();
+renderTasks();
+
+}
+
+function toggleDone(index){
+
+tasks[index].done = !tasks[index].done;
 
 saveTasks();
 renderTasks();
