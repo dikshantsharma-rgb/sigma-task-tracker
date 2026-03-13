@@ -4,224 +4,355 @@
   <meta charset="utf-8" />
   <title>Sigma Centuria — Task Tracker</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
   <style>
-    :root{
-      --bg:#f4f6f8;
-      --card:#ffffff;
-      --muted:#f1f3f7;
-      --primary:#2f6fed;
-      --text:#111;
-      --border:#ddd;
-      --danger:#c62828;
-      --warn:#b84e00;
-      --success:#156c2f;
-      --gray:#666;
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --muted: #f1f3f7;
+      --primary: #2f6fed;
+      --text: #111;
+      --border: #e1e6ef;
+      --danger: #c62828;
+      --warn: #b84e00;
+      --success: #156c2f;
+      --gray: #6b7280;
+      --shadow: 0 10px 30px rgba(0,0,0,0.08);
+      --radius: 12px;
+      --radius-sm: 8px;
     }
-    [data-theme="dark"]{
-      --bg:#0f1216;
-      --card:#151a22;
-      --muted:#1b2230;
-      --text:#eaeef5;
-      --border:#2a3443;
-      --primary:#5a84ff;
-      --gray:#aab2bf;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      padding:28px;
-    }
-    .container{
-      max-width:1100px;
-      margin:auto;
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:12px;
-      box-shadow:0 8px 20px rgba(0,0,0,0.08);
-      overflow:hidden;
-    }
-    header{
-      padding:18px 20px;
-      border-bottom:1px solid var(--border);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-    h1{
-      font-size:20px;
-      margin:0;
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-    .badge{
-      background:var(--muted);
-      padding:4px 8px;
-      border-radius:999px;
-      font-size:12px;
-      color:var(--gray);
-    }
-    .toolbar{
-      display:flex;
-      gap:8px;
-      align-items:center;
-      flex-wrap:wrap;
-    }
-    main{ padding:18px 20px; }
-
-    .dashboard{
-      display:grid;
-      grid-template-columns: repeat(4, minmax(140px,1fr));
-      gap:12px;
-    }
-    .card{
-      background:var(--muted);
-      border:1px solid var(--border);
-      border-radius:10px;
-      padding:12px;
-    }
-    .kpi{
-      font-size:12px; color:var(--gray);
-    }
-    .kpi strong{
-      font-size:18px; color:var(--text);
-    }
-    .progress{
-      height:10px; background:#e8edf5; border-radius:6px; overflow:hidden; border:1px solid var(--border); margin-top:8px;
-    }
-    .progress > div{
-      height:100%; background:var(--primary); width:0%;
-      transition:width .25s ease;
+    [data-theme="dark"] {
+      --bg: #0f141a;
+      --card: #131a22;
+      --muted: #182131;
+      --primary: #5a84ff;
+      --text: #eaeef5;
+      --border: #263041;
+      --gray: #9aa3b2;
+      --shadow: 0 10px 24px rgba(0,0,0,0.45);
     }
 
-    .controls{
-      display:grid;
-      grid-template-columns: 1fr 140px 160px 160px auto;
-      gap:8px;
-      margin-top:16px;
+    /* Reset & base */
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font: 14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background: var(--bg);
+      color: var(--text);
+      padding: 28px;
     }
-    .filters{
-      display:grid;
-      grid-template-columns: 1fr 140px 140px 160px 160px auto;
-      gap:8px;
-      margin-top:16px;
-      align-items:center;
+    a { color: inherit; }
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: clip;
     }
-    input[type="text"], input[type="date"], select, button{
-      padding:10px 12px; font-size:14px; border:1px solid var(--border); background:#fff; color:var(--text);
-      border-radius:8px; outline:none;
-    }
-    [data-theme="dark"] input[type="text"], [data-theme="dark"] input[type="date"], [data-theme="dark"] select{
-      background:#0c111a; border-color:#2a3443; color:var(--text);
-    }
-    button{
-      background:var(--primary); color:#fff; border:none; cursor:pointer;
-    }
-    button.secondary{ background:#596173; color:#fff; }
-    button.ghost{ background:transparent; border:1px solid var(--border); color:var(--text); }
-    button.warn{ background:var(--warn); }
-    button.danger{ background:var(--danger); }
-    button:disabled{ opacity:0.6; cursor:not-allowed; }
-    label small{ color:var(--gray); }
 
-    table{
-      width:100%; border-collapse: collapse; margin-top:16px; border:1px solid var(--border); border-radius:10px; overflow:hidden;
+    /* Header & Toolbar */
+    header {
+      padding: 16px 18px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(0,0,0,0.02), transparent 70%);
     }
-    th, td{
-      padding:12px; border-bottom:1px solid var(--border); text-align:left; vertical-align: middle;
+    h1 {
+      margin: 0;
+      font-size: 20px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      letter-spacing: 0.2px;
     }
-    thead th{ background:#f8fafc; }
-    [data-theme="dark"] thead th{ background:#131823; }
-    tr.completed td{ color:#8a8f99; text-decoration: line-through; }
-    .notesInput{ width: 240px; padding:6px 8px; }
-    .ownerInput{ width: 140px; padding:6px 8px; }
-    .cellInput{
-      width: 100%; padding:6px 8px; border:1px solid var(--border); border-radius:6px; background:#fff; color:var(--text);
+    .brand-badge {
+      padding: 2px 8px;
+      background: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--gray);
+      font-size: 12px;
     }
-    .cellInput:focus{ outline:2px solid rgba(47,111,237,0.25); }
-    .pill{
-      padding:4px 8px; border-radius:999px; font-size:12px; border:1px solid var(--border); display:inline-block;
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: flex-end;
     }
-    .High{ background:#ffe9e6; color:#8a1b0d; border-color:#ffc0b8; }
-    .Medium{ background:#fff4e3; color:#8a4c0d; border-color:#ffd9a3; }
-    .Low{ background:#e9f6ea; color:#135f1c; border-color:#a6e0ac; }
+    button, select, input[type="text"], input[type="date"], input[type="search"] {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #fff;
+      color: var(--text);
+      outline: none;
+    }
+    [data-theme="dark"] button, [data-theme="dark"] select,
+    [data-theme="dark"] input[type="text"], [data-theme="dark"] input[type="date"], [data-theme="dark"] input[type="search"] {
+      background: #0d131a;
+      border-color: var(--border);
+      color: var(--text);
+    }
+    button {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.02s ease, filter 0.15s ease;
+    }
+    button:hover { filter: brightness(0.98); }
+    button:active { transform: translateY(1px); }
+    .ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .secondary { background: #5c6475; color: #fff; }
+    .warn { background: var(--warn); color: #fff; }
+    .danger { background: var(--danger); color: #fff; }
+    .toolbar label.file {
+      display: inline-flex; gap: 8px; align-items: center; padding: 10px 12px;
+      border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; background: transparent;
+    }
+    .toolbar label.file input { display: none; }
 
-    .statusbar{
-      margin-top:12px; display:flex; gap:12px; align-items:center; color:var(--gray); font-size:12px;
-    }
-    .dot{ width:8px; height:8px; border-radius:50%; background:var(--primary); display:inline-block; }
+    main { padding: 18px; }
 
-    .visually-hidden{ position:absolute !important; left:-9999px !important; width:1px; height:1px; overflow:hidden; }
-    @media (max-width: 900px){
-      .controls{ grid-template-columns: 1fr 120px 140px 1fr auto; }
-      .filters{ grid-template-columns: 1fr 120px 120px 140px 140px auto; }
-      .notesInput{ width:180px; }
+    /* Dashboard */
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 14px;
     }
-    @media (max-width: 680px){
-      .controls, .filters{
-        grid-template-columns: 1fr;
-      }
-      .dashboard{ grid-template-columns: 1fr 1fr; }
+    .card {
+      background: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
     }
+    .kpi-title { color: var(--gray); font-size: 12px; }
+    .kpi-value { font-size: 22px; font-weight: 700; }
+    .progress {
+      margin-top: 10px;
+      height: 12px;
+      background: #e9eef7;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    [data-theme="dark"] .progress { background: #101826; }
+    .progress > div { height: 100%; background: var(--primary); width: 0%; transition: width .25s ease; }
+
+    /* Add Task */
+    .add-controls {
+      display: grid;
+      grid-template-columns: 1.2fr 140px 160px 140px auto;
+      gap: 10px;
+      margin: 12px 0 6px;
+    }
+    .add-controls input::placeholder { color: var(--gray); }
+
+    /* Filters */
+    .filters {
+      display: grid;
+      grid-template-columns: 1fr 150px 150px 160px 200px auto;
+      gap: 10px;
+      align-items: center;
+      margin: 10px 0 6px;
+    }
+    .filters small { color: var(--gray); }
+
+    /* Table */
+    .table-wrap {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card);
+      min-width: 980px;
+    }
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      padding: 10px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+    [data-theme="dark"] thead th { background: #0f1726; }
+    tbody td {
+      border-bottom: 1px solid var(--border);
+      padding: 10px;
+      vertical-align: top;
+    }
+    tr.completed td { color: #8790a0; text-decoration: line-through; }
+    td.actions { white-space: nowrap; }
+
+    /* Priority pills */
+    .pill {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+      line-height: 22px;
+      user-select: none;
+      cursor: default;
+    }
+    .High   { background: #ffe9e6; color: #8a1b0d; border-color: #ffc0b8; }
+    .Medium { background: #fff4e3; color: #8a4c0d; border-color: #ffd9a3; }
+    .Low    { background: #e9f6ea; color: #135f1c; border-color: #a6e0ac; }
+
+    /* Notes textarea — BIG & WRAPS */
+    .notesInput {
+      width: 100%;
+      min-height: 120px;       /* Big default */
+      max-height: 600px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+      resize: vertical;        /* allow manual resizing */
+      overflow: auto;          /* scroll if very long */
+      white-space: pre-wrap;   /* keep line breaks and wrap long lines */
+      word-break: break-word;  /* break very long words/URLs */
+      line-height: 1.45;
+    }
+    [data-theme="dark"] .notesInput {
+      background: #0c1219;
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    .cellInput {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+    }
+    [data-theme="dark"] .cellInput {
+      background: #0c1219;
+      border-color: var(--border);
+      color: var(--text);
+    }
+    .ownerInput { width: 160px; }
+    .taskEditInput { width: 100%; }
+
+    .overdue input[type="date"] {
+      border-color: #ff6b6b;
+      background: #fff5f5;
+    }
+    [data-theme="dark"] .overdue input[type="date"] {
+      background: #1e0f12;
+      border-color: #7a1b1b;
+    }
+
+    /* Status bar */
+    .statusbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 10px;
+      color: var(--gray);
+      font-size: 12px;
+      user-select: none;
+    }
+    .dot { width: 8px; height: 8px; background: var(--primary); border-radius: 50%; display: inline-block; }
+
+    /* Dashboard (read-only) mode */
+    .dashboard-mode .add-controls,
+    .dashboard-mode .filters .edit-only,
+    .dashboard-mode td.actions,
+    .dashboard-mode .toolbar .edit-only {
+      display: none !important;
+    }
+    .dashboard-mode input,
+    .dashboard-mode select,
+    .dashboard-mode textarea,
+    .dashboard-mode button.toggleDone {
+      pointer-events: none !important;
+      opacity: 0.95;
+    }
+    .dashboard-mode .notesInput { pointer-events: auto; } /* still allow scrolling in notes */
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .filters { grid-template-columns: 1fr 140px 140px 150px 1fr auto; }
+      .add-controls { grid-template-columns: 1.2fr 130px 150px 120px auto; }
+    }
+    @media (max-width: 760px) {
+      header { grid-template-columns: 1fr; }
+      .toolbar { justify-content: flex-start; }
+      .dashboard { grid-template-columns: 1fr 1fr; }
+      .filters, .add-controls { grid-template-columns: 1fr; }
+    }
+    .visually-hidden { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; overflow: hidden; }
   </style>
 </head>
 <body>
   <div class="container" id="app">
     <header>
-      <h1>🗂️ Sigma Centuria <span class="badge">Task Tracker</span></h1>
+      <h1>🗂️ Sigma Centuria <span class="brand-badge">Task Tracker</span></h1>
       <div class="toolbar">
         <button id="themeToggle" class="ghost" title="Toggle theme">🌓 Theme</button>
-        <button id="exportBtn" class="secondary" title="Download tasks as JSON">Export</button>
-        <label class="ghost" style="padding:10px 12px; cursor:pointer;" title="Import tasks from JSON">
-          Import<input id="importFile" type="file" accept="application/json" class="visually-hidden" />
+        <button id="dashboardModeToggle" class="ghost" title="Toggle read-only dashboard view">📊 Dashboard Mode</button>
+        <button id="exportBtn" class="secondary" title="Export tasks to JSON">Export</button>
+        <label class="file edit-only" title="Import tasks from JSON">
+          Import <input id="importFile" type="file" accept="application/json" />
         </label>
-        <button id="resetBtn" class="warn" title="Reset to default tasks">Reset</button>
-        <button id="clearBtn" class="danger" title="Clear all tasks">Clear</button>
+        <button id="resetBtn" class="warn edit-only" title="Reset to default tasks">Reset</button>
+        <button id="clearBtn" class="danger edit-only" title="Clear all tasks">Clear</button>
       </div>
     </header>
 
     <main>
-      <!-- KPI / Progress -->
-      <section class="dashboard" aria-label="Dashboard">
+      <!-- Dashboard KPIs -->
+      <section class="dashboard" aria-label="Dashboard metrics">
         <div class="card">
-          <div class="kpi">Total Tasks</div>
-          <div class="kpi"><strong id="kpiTotal">0</strong></div>
+          <div class="kpi-title">Total Tasks</div>
+          <div class="kpi-value" id="kpiTotal">0</div>
         </div>
         <div class="card">
-          <div class="kpi">Completed</div>
-          <div class="kpi"><strong id="kpiCompleted">0</strong></div>
+          <div class="kpi-title">Completed</div>
+          <div class="kpi-value" id="kpiCompleted">0</div>
         </div>
         <div class="card">
-          <div class="kpi">Pending</div>
-          <div class="kpi"><strong id="kpiPending">0</strong></div>
+          <div class="kpi-title">Pending</div>
+          <div class="kpi-value" id="kpiPending">0</div>
         </div>
-        <div class="card" aria-label="Progress">
-          <div class="kpi">Progress</div>
-          <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-            <div id="progressBar"></div>
-          </div>
+        <div class="card">
+          <div class="kpi-title">Progress</div>
+          <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="progressFill"></div></div>
         </div>
       </section>
 
       <!-- Add Task -->
-      <section class="controls" aria-label="Add task">
+      <section class="add-controls" aria-label="Add task">
         <input id="taskInput" type="text" placeholder="Task name (e.g., Launch Google Ads for Phase 2)" />
         <select id="priorityInput" aria-label="Priority">
           <option>High</option><option>Medium</option><option>Low</option>
         </select>
         <input id="deadlineInput" type="date" aria-label="Deadline (optional)" />
         <input id="ownerInput" type="text" placeholder="Owner (optional)" />
-        <button id="addBtn">Add Task</button>
+        <button id="addBtn" class="edit-only">Add Task</button>
       </section>
 
-      <!-- Filters / Sorting -->
+      <!-- Filters -->
       <section class="filters" aria-label="Filters">
-        <input id="searchInput" type="text" placeholder="Search task, notes, or owner…" />
+        <input id="searchInput" type="search" placeholder="Search task, notes, or owner…" />
         <select id="statusFilter" aria-label="Status filter">
           <option value="all">All</option>
           <option value="pending">Pending</option>
@@ -245,21 +376,21 @@
           <option value="name">Sort: Name</option>
           <option value="status">Sort: Status</option>
         </select>
-        <button id="clearFilters" class="ghost">Clear Filters</button>
+        <button id="clearFilters" class="ghost">Clear</button>
       </section>
 
       <!-- Table -->
-      <section aria-label="Task list">
+      <section class="table-wrap" aria-label="Task list">
         <table id="taskTable">
           <thead>
             <tr>
-              <th>Done</th>
-              <th>Task</th>
-              <th>Priority</th>
-              <th>Deadline</th>
-              <th>Owner</th>
-              <th>Notes</th>
-              <th>Actions</th>
+              <th style="width:70px">Done</th>
+              <th style="min-width:260px">Task</th>
+              <th style="width:110px">Priority</th>
+              <th style="width:140px">Deadline</th>
+              <th style="width:160px">Owner</th>
+              <th style="min-width:360px">Notes</th>
+              <th style="width:150px" class="edit-only">Actions</th>
             </tr>
           </thead>
           <tbody id="taskBody"></tbody>
@@ -277,19 +408,24 @@
   </div>
 
   <script type="module">
-    /***************
-     * CONFIG / CONST
-     ***************/
+    /***********************
+     * CONFIG / CONSTANTS
+     ***********************/
     const APP = {
+      VERSION: 2,
       STORAGE_KEY_V2: "sigmaCenturia.tasks.v2",
-      STORAGE_KEY_V1: "tasks",               // migrate old data if found
+      STORAGE_KEY_V1: "tasks",                 // very old key
+      STORAGE_KEY_SHORT: "sigmacenturia_tasks",// short key from earlier version
       THEME_KEY: "sigmaCenturia.theme",
-      SCHEMA_VERSION: 2,
+      DASHBOARD_MODE_KEY: "sigmaCenturia.dashboardMode",
       PRIORITY_ORDER: { High: 3, Medium: 2, Low: 1 },
     };
 
-    const $ = (s, root=document) => root.querySelector(s);
-    const $$ = (s, root=document) => Array.from(root.querySelectorAll(s));
+    /***********************
+     * UTILITIES
+     ***********************/
+    const $  = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 
     const escapeHtml = (str) =>
       String(str ?? "")
@@ -297,82 +433,28 @@
         .replace(/>/g,"&gt;").replace(/"/g,"&quot;")
         .replace(/'/g,"&#039;");
 
-    const fmtDate = (iso) => {
-      if (!iso) return "";
-      const d = new Date(iso);
-      if (Number.isNaN(d.getTime())) return "";
-      return d.toLocaleDateString();
-    };
-
-    const debounce = (fn, ms=300) => {
+    const debounce = (fn, ms=250) => {
       let t; return (...args) => { clearTimeout(t); t = setTimeout(()=>fn(...args), ms); };
     };
 
     const uuid = () => (crypto?.randomUUID?.() ?? (Date.now().toString(36) + Math.random().toString(36).slice(2)));
 
-    /***************
-     * STORAGE (safe)
-     ***************/
-    const Storage = {
-      load(){
-        // Try v2
-        try {
-          const raw = localStorage.getItem(APP.STORAGE_KEY_V2);
-          if (raw){
-            const parsed = JSON.parse(raw);
-            if (parsed?.version === APP.SCHEMA_VERSION && Array.isArray(parsed?.items)) {
-              return parsed.items;
-            }
-          }
-        } catch (e) {
-          console.warn("Failed to load v2:", e);
-        }
-        // Migrate from v1 (old "tasks" array without ids)
-        try {
-          const rawV1 = localStorage.getItem(APP.STORAGE_KEY_V1);
-          if (rawV1) {
-            const arr = JSON.parse(rawV1);
-            if (Array.isArray(arr)) {
-              const migrated = arr.map(t => ({
-                id: uuid(),
-                task: String(t.task ?? ""),
-                priority: ["High","Medium","Low"].includes(t.priority) ? t.priority : "Medium",
-                notes: String(t.notes ?? ""),
-                done: Boolean(t.done),
-                owner: "",
-                deadline: "",
-                createdAt: Date.now(),
-              }));
-              this.save(migrated);
-              // Remove old key to avoid confusion
-              localStorage.removeItem(APP.STORAGE_KEY_V1);
-              return migrated;
-            }
-          }
-        } catch (e) {
-          console.warn("Failed to migrate from v1:", e);
-        }
-        // Seed defaults
-        const seeded = Defaults.seed();
-        this.save(seeded);
-        return seeded;
-      },
-      save(items){
-        try {
-          localStorage.setItem(APP.STORAGE_KEY_V2, JSON.stringify({ version: APP.SCHEMA_VERSION, items }));
-          UI.markSaved();
-        } catch (e) {
-          UI.error("Saving to localStorage failed. If you're in Private/Incognito mode or storage is blocked, enable storage or use a normal window.\n\n" + e.message);
-        }
-      },
-      clear(){
-        localStorage.removeItem(APP.STORAGE_KEY_V2);
-      },
+    const nowIsoDate = () => {
+      const d = new Date();
+      const m = String(d.getMonth()+1).padStart(2,'0');
+      const day = String(d.getDate()).padStart(2,'0');
+      return `${d.getFullYear()}-${m}-${day}`;
     };
 
-    /***************
-     * DEFAULT DATA
-     ***************/
+    function autoGrow(el) {
+      if (!el) return;
+      el.style.height = "auto";
+      el.style.height = (el.scrollHeight) + "px";
+    }
+
+    /***********************
+     * DEFAULT TASKS
+     ***********************/
     const Defaults = {
       list: [
         {task:"Leaflets distribution for first two weekends",priority:"High",notes:"Prepare circulation quotation",done:false},
@@ -391,243 +473,371 @@
         {task:"Drone shoot alignment",priority:"Medium",notes:"Schedule location shoot",done:false},
         {task:"Weekly sales review alignment",priority:"Low",notes:"Internal review meeting",done:false}
       ],
-      seed(){
-        const now = Date.now();
+      seed() {
+        const base = Date.now();
         return this.list.map((t, i) => ({
           id: uuid(),
-          task: t.task,
+          task: String(t.task),
           priority: t.priority,
-          notes: t.notes,
-          done: t.done,
+          notes: String(t.notes ?? ""),
+          done: Boolean(t.done),
           owner: "",
           deadline: "",
-          createdAt: now + i,
+          createdAt: base + i,
         }));
       }
     };
 
-    /***************
-     * MODEL (State & Ops)
-     ***************/
+    /***********************
+     * STORAGE (safe + migration)
+     ***********************/
+    const Storage = {
+      load() {
+        // Try v2
+        try {
+          const raw = localStorage.getItem(APP.STORAGE_KEY_V2);
+          if (raw) {
+            const obj = JSON.parse(raw);
+            if (obj?.version === APP.VERSION && Array.isArray(obj?.items)) {
+              return obj.items;
+            }
+          }
+        } catch (e) {
+          console.warn("Load v2 failed:", e);
+        }
+
+        // Migrate from older keys if present
+        const migrated = this.migrate();
+        if (migrated) {
+          this.save(migrated);
+          return migrated;
+        }
+
+        // Seed defaults
+        const seeded = Defaults.seed();
+        this.save(seeded);
+        return seeded;
+      },
+
+      migrate() {
+        // From very old 'tasks' (array of {task, priority, notes, done})
+        try {
+          const rawV1 = localStorage.getItem(APP.STORAGE_KEY_V1);
+          if (rawV1) {
+            const arr = JSON.parse(rawV1);
+            if (Array.isArray(arr)) {
+              const migrated = arr.map(t => ({
+                id: uuid(),
+                task: String(t.task ?? ""),
+                priority: ["High","Medium","Low"].includes(t.priority) ? t.priority : "Medium",
+                notes: String(t.notes ?? ""),
+                done: Boolean(t.done),
+                owner: "",
+                deadline: "",
+                createdAt: Date.now(),
+              }));
+              localStorage.removeItem(APP.STORAGE_KEY_V1);
+              return migrated;
+            }
+          }
+        } catch (e) {
+          console.warn("Failed migration from v1:", e);
+        }
+
+        // From short key 'sigmacenturia_tasks' used by earlier minimal build
+        try {
+          const rawShort = localStorage.getItem(APP.STORAGE_KEY_SHORT);
+          if (rawShort) {
+            const arr = JSON.parse(rawShort);
+            if (Array.isArray(arr)) {
+              const migrated = arr.map(t => ({
+                id: t.id || uuid(),
+                task: String(t.task ?? ""),
+                priority: ["High","Medium","Low"].includes(t.priority) ? t.priority : "Medium",
+                notes: String(t.notes ?? ""),
+                done: Boolean(t.done),
+                owner: String(t.owner ?? ""),
+                deadline: String(t.deadline ?? ""),
+                createdAt: Number.isFinite(t.createdAt) ? t.createdAt : Date.now(),
+              }));
+              localStorage.removeItem(APP.STORAGE_KEY_SHORT);
+              return migrated;
+            }
+          }
+        } catch (e) {
+          console.warn("Failed migration from short key:", e);
+        }
+
+        return null;
+      },
+
+      save(items) {
+        try {
+          localStorage.setItem(APP.STORAGE_KEY_V2, JSON.stringify({ version: APP.VERSION, items }));
+          UI.markSaved();
+        } catch (e) {
+          UI.error("Saving to localStorage failed. If you're in Private/Incognito or storage is blocked, enable storage or use a normal window.\n\n" + e.message);
+        }
+      },
+
+      clear() { localStorage.removeItem(APP.STORAGE_KEY_V2); }
+    };
+
+    /***********************
+     * STATE (model)
+     ***********************/
     const State = {
       items: [],
       filters: {
         q: "",
-        status: "all",
-        priority: "all",
-        owner: "all",
-        sort: "createdDesc",
+        status: "all",          // all|pending|completed
+        priority: "all",        // all|High|Medium|Low
+        owner: "all",           // all|<owner>
+        sort: "createdDesc",    // createdDesc|createdAsc|priority|deadlineAsc|deadlineDesc|name|status
       },
-      init(){
+      dashboardMode: false,
+
+      init() {
         this.items = Storage.load();
+        // Load settings
+        const mode = localStorage.getItem(APP.DASHBOARD_MODE_KEY);
+        this.dashboardMode = mode === "1";
       },
-      add({ task, priority, notes, owner, deadline }){
+
+      add({ task, priority, owner, deadline }) {
         const item = {
           id: uuid(),
           task: task.trim(),
           priority: ["High","Medium","Low"].includes(priority) ? priority : "Medium",
-          notes: notes?.trim() ?? "",
+          notes: "",
           done: false,
           owner: owner?.trim() ?? "",
           deadline: deadline || "",
           createdAt: Date.now(),
         };
-        this.items.unshift(item); // newest first
+        this.items.unshift(item);
         Storage.save(this.items);
         return item;
       },
-      update(id, patch){
+
+      update(id, patch) {
         const i = this.items.findIndex(x => x.id === id);
         if (i === -1) return;
         this.items[i] = { ...this.items[i], ...patch };
         Storage.save(this.items);
       },
-      remove(id){
+
+      remove(id) {
         this.items = this.items.filter(x => x.id !== id);
         Storage.save(this.items);
       },
-      toggleDone(id){
+
+      toggleDone(id) {
         const it = this.items.find(x => x.id === id);
         if (!it) return;
         it.done = !it.done;
         Storage.save(this.items);
       },
-      clear(){
+
+      clear() {
         this.items = [];
         Storage.save(this.items);
       },
-      reset(){
+
+      reset() {
         this.items = Defaults.seed();
         Storage.save(this.items);
       },
-      deriveOwners(){
-        const owners = new Set(this.items.map(i => i.owner).filter(Boolean));
-        return ["all", ...Array.from(owners).sort((a,b)=>a.localeCompare(b))];
-      },
-      query(){
-        let list = [...this.items];
 
-        // filter
-        const { q, status, priority, owner } = this.filters;
-        if (status !== "all") {
-          list = list.filter(i => status === "completed" ? i.done : !i.done);
+      deriveOwners() {
+        const o = new Set(this.items.map(i => i.owner).filter(Boolean));
+        return ["all", ...Array.from(o).sort((a,b)=>a.localeCompare(b))];
+      },
+
+      query() {
+        let list = [...this.items];
+        const f = this.filters;
+        // filter: status
+        if (f.status !== "all") {
+          list = list.filter(i => f.status === "completed" ? i.done : !i.done);
         }
-        if (priority !== "all") {
-          list = list.filter(i => i.priority === priority);
+        // filter: priority
+        if (f.priority !== "all") {
+          list = list.filter(i => i.priority === f.priority);
         }
-        if (owner !== "all") {
-          list = list.filter(i => i.owner === owner);
+        // filter: owner
+        if (f.owner !== "all") {
+          list = list.filter(i => i.owner === f.owner);
         }
-        if (q) {
-          const needle = q.toLowerCase();
+        // search
+        if (f.q) {
+          const q = f.q.toLowerCase();
           list = list.filter(i =>
-            i.task.toLowerCase().includes(needle) ||
-            (i.notes||"").toLowerCase().includes(needle) ||
-            (i.owner||"").toLowerCase().includes(needle)
+            i.task.toLowerCase().includes(q)
+            || (i.notes||"").toLowerCase().includes(q)
+            || (i.owner||"").toLowerCase().includes(q)
           );
         }
-
         // sort
-        const sort = this.filters.sort;
-        const prio = (p) => APP.PRIORITY_ORDER[p] || 0;
-        list.sort((a,b) => {
-          switch (sort) {
-            case "createdAsc": return a.createdAt - b.createdAt;
-            case "createdDesc": return b.createdAt - a.createdAt;
-            case "priority": return prio(b.priority) - prio(a.priority) || a.task.localeCompare(b.task);
-            case "deadlineAsc": return (a.deadline||"") < (b.deadline||"") ? -1 : (a.deadline||"") > (b.deadline||"") ? 1 : 0;
-            case "deadlineDesc": return (a.deadline||"") > (b.deadline||"") ? -1 : (a.deadline||"") < (b.deadline||"") ? 1 : 0;
-            case "name": return a.task.localeCompare(b.task);
-            case "status": return (a.done === b.done) ? 0 : a.done ? 1 : -1;
-            default: return b.createdAt - a.createdAt;
-          }
-        });
+        const pr = (p) => APP.PRIORITY_ORDER[p] || 0;
+        switch (f.sort) {
+          case "createdAsc":  list.sort((a,b)=> a.createdAt - b.createdAt); break;
+          case "createdDesc": list.sort((a,b)=> b.createdAt - a.createdAt); break;
+          case "priority":    list.sort((a,b)=> pr(b.priority) - pr(a.priority) || a.task.localeCompare(b.task)); break;
+          case "deadlineAsc": list.sort((a,b)=> (a.deadline||"") < (b.deadline||"") ? -1 : (a.deadline||"") > (b.deadline||"") ? 1 : 0); break;
+          case "deadlineDesc":list.sort((a,b)=> (a.deadline||"") > (b.deadline||"") ? -1 : (a.deadline||"") < (b.deadline||"") ? 1 : 0); break;
+          case "name":        list.sort((a,b)=> a.task.localeCompare(b.task)); break;
+          case "status":      list.sort((a,b)=> (a.done === b.done) ? 0 : a.done ? 1 : -1); break;
+          default:            list.sort((a,b)=> b.createdAt - a.createdAt);
+        }
         return list;
       },
-      kpis(){
+
+      kpis() {
         const total = this.items.length;
         const completed = this.items.filter(i => i.done).length;
         const pending = total - completed;
-        const pct = total ? Math.round((completed/total)*100) : 0;
+        const pct = total ? Math.round((completed / total) * 100) : 0;
         return { total, completed, pending, pct };
       }
     };
 
-    /***************
-     * UI / VIEW
-     ***************/
+    /***********************
+     * UI (view)
+     ***********************/
     const UI = {
       els: {
-        body: document.body,
+        app: $("#app"),
         taskBody: $("#taskBody"),
         kpiTotal: $("#kpiTotal"),
         kpiCompleted: $("#kpiCompleted"),
         kpiPending: $("#kpiPending"),
-        progressBar: $("#progressBar").parentElement,
-        progressFill: $("#progressBar"),
+        progressFill: $("#progressFill"),
         statusText: $("#statusText"),
         lastSaved: $("#lastSaved"),
         ownerFilter: $("#ownerFilter"),
         errorBox: $("#errorBox"),
       },
-      renderAll(){
-        // table
-        const rows = State.query().map(it => UI.row(it)).join("");
-        this.els.taskBody.innerHTML = rows || `<tr><td colspan="7" style="color:var(--gray);">No tasks yet. Add your first one above.</td></tr>`;
 
-        // kpis + progress
+      renderAll() {
+        // Set mode class
+        UI.els.app.classList.toggle("dashboard-mode", State.dashboardMode);
+
+        // Table
+        const list = State.query();
+        UI.els.taskBody.innerHTML = list.map(UI.row).join("") || `
+          <tr><td colspan="7" style="color:var(--gray); padding:18px;">No tasks to show. Add your first one above.</td></tr>
+        `;
+
+        // Auto-grow notes
+        $$(".notesInput", UI.els.taskBody).forEach(autoGrow);
+
+        // KPI + progress
         const { total, completed, pending, pct } = State.kpis();
-        this.els.kpiTotal.textContent = total;
-        this.els.kpiCompleted.textContent = completed;
-        this.els.kpiPending.textContent = pending;
-        this.els.progressBar.setAttribute("aria-valuenow", pct);
-        this.els.progressFill.style.width = pct + "%";
+        UI.els.kpiTotal.textContent = total;
+        UI.els.kpiCompleted.textContent = completed;
+        UI.els.kpiPending.textContent = pending;
+        UI.els.progressFill.style.width = pct + "%";
+        UI.els.progressFill.parentElement.setAttribute("aria-valuenow", pct);
 
-        // owner filter options
+        // Owner filter options
         const owners = State.deriveOwners();
         const current = State.filters.owner;
-        UI.els.ownerFilter.innerHTML = owners.map(o => `<option value="${escapeHtml(o)}"${o===current?' selected':''}>${o==="all"?"All owners":escapeHtml(o)}</option>`).join("");
+        UI.els.ownerFilter.innerHTML = owners.map(o => `
+          <option value="${escapeHtml(o)}"${o===current?' selected':''}>${o==="all"?"All owners":escapeHtml(o)}</option>
+        `).join("");
       },
-      row(it){
-        const overdue = it.deadline && !it.done && new Date(it.deadline) < new Date();
+
+      row(it) {
+        const overdue = it.deadline && !it.done && (new Date(it.deadline) < new Date(nowIsoDate()));
         return `
           <tr data-id="${it.id}" class="${it.done ? 'completed' : ''}">
-            <td><input type="checkbox" class="toggleDone" ${it.done ? 'checked' : ''} aria-label="Mark done"></td>
-            <td>${escapeHtml(it.task)}</td>
-            <td><span class="pill ${it.priority}">${it.priority}</span></td>
             <td>
-              <input class="cellInput" type="date" value="${it.deadline || ''}" aria-label="Deadline"${overdue?' style="border-color:#ff6b6b; background:#fff3f3;"':''}/>
+              <input type="checkbox" class="toggleDone" ${it.done ? 'checked' : ''} aria-label="Mark done">
+            </td>
+            <td class="task-cell">
+              <div class="task-text">${escapeHtml(it.task)}</div>
             </td>
             <td>
-              <input class="cellInput ownerInput" type="text" value="${escapeHtml(it.owner||'')}" placeholder="Owner" aria-label="Owner"/>
+              <span class="pill ${it.priority}">${it.priority}</span>
+              <div style="margin-top:6px;">
+                <select class="cellInput prioritySelect" aria-label="Change priority">
+                  <option${it.priority==='High'?' selected':''}>High</option>
+                  <option${it.priority==='Medium'?' selected':''}>Medium</option>
+                  <option${it.priority==='Low'?' selected':''}>Low</option>
+                </select>
+              </div>
+            </td>
+            <td class="${overdue ? 'overdue' : ''}">
+              <input class="cellInput" type="date" value="${it.deadline || ''}" aria-label="Deadline">
             </td>
             <td>
-              <input class="cellInput notesInput" type="text" value="${escapeHtml(it.notes||'')}" placeholder="Notes" aria-label="Notes"/>
+              <input class="cellInput ownerInput" type="text" value="${escapeHtml(it.owner || '')}" placeholder="Owner" aria-label="Owner">
             </td>
             <td>
+              <textarea class="notesInput" placeholder="Notes" aria-label="Notes">${escapeHtml(it.notes || '')}</textarea>
+            </td>
+            <td class="actions edit-only">
               <button class="ghost editBtn" title="Edit task name">Edit</button>
+              <button class="ghost duplicateBtn" title="Duplicate task">Duplicate</button>
               <button class="danger deleteBtn" title="Delete task">Delete</button>
             </td>
           </tr>
         `;
       },
-      info(msg){ this.els.statusText.textContent = msg; },
-      markSaved(){
-        const ts = new Date();
-        $("#lastSaved").textContent = "• Last saved: " + ts.toLocaleString();
-        this.info("Saved");
+
+      info(msg) {
+        UI.els.statusText.textContent = msg;
       },
-      error(msg){
-        const eb = this.els.errorBox;
+
+      markSaved() {
+        UI.els.lastSaved.textContent = "• Last saved: " + (new Date()).toLocaleString();
+        UI.info("Saved");
+      },
+
+      error(msg) {
+        const eb = UI.els.errorBox;
         eb.classList.remove("visually-hidden");
         eb.textContent = msg;
-        setTimeout(()=>{ eb.classList.add("visually-hidden"); }, 5000);
+        setTimeout(()=> eb.classList.add("visually-hidden"), 6000);
       }
     };
 
-    /***************
-     * CONTROLLER / EVENTS
-     ***************/
+    /***********************
+     * CONTROLLER (events)
+     ***********************/
     const Controller = {
-      init(){
+      init() {
         // Theme
         const theme = localStorage.getItem(APP.THEME_KEY) || "light";
         document.documentElement.setAttribute("data-theme", theme);
 
-        // Load state + render
+        // Load state
         State.init();
         UI.renderAll();
 
-        // Add Task
-        $("#addBtn").addEventListener("click", Controller.addTask);
-        $("#taskInput").addEventListener("keydown", e => { if (e.key==="Enter") Controller.addTask(); });
-        $("#ownerInput").addEventListener("keydown", e => { if (e.key==="Enter") Controller.addTask(); });
-        $("#deadlineInput").addEventListener("keydown", e => { if (e.key==="Enter") Controller.addTask(); });
-
-        // Filters
-        $("#searchInput").addEventListener("input", debounce((e)=>{ State.filters.q = e.target.value.trim(); UI.renderAll(); }, 150));
-        $("#statusFilter").addEventListener("change", (e)=>{ State.filters.status = e.target.value; UI.renderAll(); });
-        $("#priorityFilter").addEventListener("change", (e)=>{ State.filters.priority = e.target.value; UI.renderAll(); });
-        $("#ownerFilter").addEventListener("change", (e)=>{ State.filters.owner = e.target.value; UI.renderAll(); });
-        $("#sortSelect").addEventListener("change", (e)=>{ State.filters.sort = e.target.value; UI.renderAll(); });
-        $("#clearFilters").addEventListener("click", ()=>{
-          State.filters = { q:"", status:"all", priority:"all", owner:"all", sort:"createdDesc" };
-          $("#searchInput").value = "";
-          $("#statusFilter").value = "all";
-          $("#priorityFilter").value = "all";
-          $("#sortSelect").value = "createdDesc";
-          UI.renderAll();
-        });
-
-        // Theme
+        // Toolbar
         $("#themeToggle").addEventListener("click", ()=>{
-          const isDark = document.documentElement.getAttribute("data-theme") === "dark";
-          const next = isDark ? "light" : "dark";
+          const current = document.documentElement.getAttribute("data-theme") || "light";
+          const next = current === "light" ? "dark" : "light";
           document.documentElement.setAttribute("data-theme", next);
           localStorage.setItem(APP.THEME_KEY, next);
         });
 
-        // Export / Import / Reset / Clear
+        const dmBtn = $("#dashboardModeToggle");
+        dmBtn.addEventListener("click", ()=>{
+          State.dashboardMode = !State.dashboardMode;
+          localStorage.setItem(APP.DASHBOARD_MODE_KEY, State.dashboardMode ? "1" : "0");
+          UI.renderAll();
+          dmBtn.classList.toggle("secondary", State.dashboardMode);
+          dmBtn.textContent = State.dashboardMode ? "✅ Dashboard Mode" : "📊 Dashboard Mode";
+        });
+        // Initialize button state
+        if (State.dashboardMode) {
+          dmBtn.classList.add("secondary");
+          dmBtn.textContent = "✅ Dashboard Mode";
+        }
+
         $("#exportBtn").addEventListener("click", Controller.exportJson);
         $("#importFile").addEventListener("change", Controller.importJson);
         $("#resetBtn").addEventListener("click", ()=>{
@@ -641,12 +851,33 @@
           }
         });
 
-        // Table Delegation
+        // Add Task
+        $("#addBtn").addEventListener("click", Controller.addTask);
+        $("#taskInput").addEventListener("keydown", e => { if (e.key === "Enter") Controller.addTask(); });
+        $("#ownerInput").addEventListener("keydown", e => { if (e.key === "Enter") Controller.addTask(); });
+        $("#deadlineInput").addEventListener("keydown", e => { if (e.key === "Enter") Controller.addTask(); });
+
+        // Filters
+        $("#searchInput").addEventListener("input", debounce(e => { State.filters.q = e.target.value.trim(); UI.renderAll(); }, 150));
+        $("#statusFilter").addEventListener("change", e => { State.filters.status = e.target.value; UI.renderAll(); });
+        $("#priorityFilter").addEventListener("change", e => { State.filters.priority = e.target.value; UI.renderAll(); });
+        $("#ownerFilter").addEventListener("change", e => { State.filters.owner = e.target.value; UI.renderAll(); });
+        $("#sortSelect").addEventListener("change", e => { State.filters.sort = e.target.value; UI.renderAll(); });
+        $("#clearFilters").addEventListener("click", ()=>{
+          State.filters = { q:"", status:"all", priority:"all", owner:"all", sort:"createdDesc" };
+          $("#searchInput").value = "";
+          $("#statusFilter").value = "all";
+          $("#priorityFilter").value = "all";
+          $("#sortSelect").value = "createdDesc";
+          UI.renderAll();
+        });
+
+        // Table delegation
         $("#taskBody").addEventListener("change", Controller.onTableChange);
-        $("#taskBody").addEventListener("input", debounce(Controller.onTableInput, 200));
+        $("#taskBody").addEventListener("input", debounce(Controller.onTableInput, 180));
         $("#taskBody").addEventListener("click", Controller.onTableClick);
 
-        // Sync across tabs on same machine
+        // Sync across tabs (same device)
         window.addEventListener("storage", (e) => {
           if (e.key === APP.STORAGE_KEY_V2) {
             State.items = Storage.load();
@@ -656,92 +887,133 @@
         });
       },
 
-      addTask(){
+      addTask() {
         const task = $("#taskInput").value;
         const priority = $("#priorityInput").value;
         const owner = $("#ownerInput").value;
         const deadline = $("#deadlineInput").value;
         if (!task.trim()) {
-          UI.error("Task name cannot be empty.");
-          $("#taskInput").focus();
-          return;
+          UI.error("Task name cannot be empty."); $("#taskInput").focus(); return;
         }
-        State.add({ task, priority, notes: "", owner, deadline });
+        State.add({ task, priority, owner, deadline });
         // Clear inputs
         $("#taskInput").value = ""; $("#ownerInput").value = ""; $("#deadlineInput").value = "";
         $("#taskInput").focus();
         UI.renderAll();
       },
 
-      // Checkbox, date changes
-      onTableChange(e){
+      onTableChange(e) {
         const row = e.target.closest("tr[data-id]");
         if (!row) return;
         const id = row.dataset.id;
-        if (e.target.classList.contains("toggleDone")){
+
+        // Done toggle
+        if (e.target.classList.contains("toggleDone")) {
           State.toggleDone(id);
-          UI.renderAll(); // apply strike-through + recalc kpis
+          UI.renderAll();
           return;
         }
-        // Date change
-        if (e.target.type === "date"){
+
+        // Priority change
+        if (e.target.classList.contains("prioritySelect")) {
+          State.update(id, { priority: e.target.value });
+          UI.renderAll(); // update pill
+          return;
+        }
+
+        // Deadline change
+        if (e.target.type === "date") {
           State.update(id, { deadline: e.target.value || "" });
-          UI.renderAll(); // re-eval overdue styling
+          UI.renderAll(); // apply overdue style if needed
+          return;
         }
       },
 
-      // Inline inputs (notes/owner)
-      onTableInput(e){
+      onTableInput(e) {
         const row = e.target.closest("tr[data-id]");
         if (!row) return;
         const id = row.dataset.id;
-        if (e.target.classList.contains("notesInput")){
-          State.update(id, { notes: e.target.value });
-          UI.info("Saving...");
-        } else if (e.target.classList.contains("ownerInput")){
+
+        // Owner
+        if (e.target.classList.contains("ownerInput")) {
           State.update(id, { owner: e.target.value });
           UI.info("Saving...");
+          return;
+        }
+
+        // Notes
+        if (e.target.classList.contains("notesInput")) {
+          autoGrow(e.target);
+          State.update(id, { notes: e.target.value });
+          UI.info("Saving...");
+          return;
         }
       },
 
-      onTableClick(e){
+      onTableClick(e) {
         const row = e.target.closest("tr[data-id]");
         if (!row) return;
         const id = row.dataset.id;
-        if (e.target.classList.contains("deleteBtn")){
+
+        // Delete
+        if (e.target.classList.contains("deleteBtn")) {
           if (confirm("Delete this task?")) {
             State.remove(id);
             UI.renderAll();
           }
-        } else if (e.target.classList.contains("editBtn")){
+          return;
+        }
+
+        // Duplicate
+        if (e.target.classList.contains("duplicateBtn")) {
+          const src = State.items.find(t => t.id === id);
+          if (!src) return;
+          const copy = {
+            ...src,
+            id: uuid(),
+            task: src.task + " (copy)",
+            done: false,
+            createdAt: Date.now()
+          };
+          State.items.unshift(copy);
+          Storage.save(State.items);
+          UI.renderAll();
+          return;
+        }
+
+        // Edit task name
+        if (e.target.classList.contains("editBtn")) {
           Controller.editTaskName(row, id);
+          return;
         }
       },
 
-      editTaskName(row, id){
-        const cell = row.children[1];
-        const current = cell.textContent;
+      editTaskName(row, id) {
+        const cell = row.querySelector(".task-cell");
+        const currentText = cell.querySelector(".task-text")?.textContent || "";
         const input = document.createElement("input");
         input.type = "text";
-        input.className = "cellInput";
-        input.value = current;
-        input.ariaLabel = "Edit task name";
-        cell.replaceChildren(input);
+        input.className = "cellInput taskEditInput";
+        input.value = currentText;
+        input.setAttribute("aria-label", "Edit task name");
+        cell.innerHTML = "";
+        cell.appendChild(input);
         input.focus();
         input.select();
-        const commit = () => {
+
+        const finish = (commit) => {
           const next = input.value.trim();
-          if (next) State.update(id, { task: next });
+          if (commit && next) State.update(id, { task: next });
           UI.renderAll();
         };
         input.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") commit();
-          if (e.key === "Escape") UI.renderAll();
+          if (e.key === "Enter") finish(true);
+          if (e.key === "Escape") finish(false);
         });
-        input.addEventListener("blur", commit);
+        input.addEventListener("blur", () => finish(true));
       },
 
-      exportJson(){
+      exportJson() {
         try {
           const blob = new Blob([JSON.stringify(State.items, null, 2)], { type: "application/json" });
           const url = URL.createObjectURL(blob);
@@ -756,13 +1028,14 @@
         } catch (e) { UI.error("Export failed: " + e.message); }
       },
 
-      async importJson(e){
+      async importJson(e) {
         const file = e.target.files?.[0];
         if (!file) return;
         try {
           const text = await file.text();
           const data = JSON.parse(text);
           if (!Array.isArray(data)) throw new Error("Invalid file format: expected an array");
+
           // normalize
           State.items = data.map(x => ({
             id: x.id || uuid(),
@@ -777,17 +1050,18 @@
           Storage.save(State.items);
           UI.renderAll();
           UI.info("Imported JSON");
-          e.target.value = ""; // reset input
+          e.target.value = ""; // reset
         } catch (err) {
           UI.error("Import failed: " + err.message);
         }
       }
     };
 
-    /***************
+    /***********************
      * BOOT
-     ***************/
+     ***********************/
     Controller.init();
   </script>
 </body>
 </html>
+``
