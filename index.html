@@ -1,1 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sigma Task Tracker</title>
 
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6f8;
+padding:40px;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 5px 10px rgba(0,0,0,0.1);
+}
+
+h1{
+text-align:center;
+}
+
+input,select,button{
+padding:10px;
+margin:5px;
+}
+
+table{
+width:100%;
+margin-top:20px;
+border-collapse:collapse;
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid #ddd;
+}
+
+button{
+background:#2f6fed;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Sigma Centuria Task Tracker</h1>
+
+<input id="task" placeholder="Task name">
+
+<select id="priority">
+<option>High</option>
+<option>Medium</option>
+<option>Low</option>
+</select>
+
+<select id="status">
+<option>Pending</option>
+<option>In Progress</option>
+<option>Completed</option>
+</select>
+
+<button onclick="addTask()">Add Task</button>
+
+<table id="taskTable">
+
+<tr>
+<th>Task</th>
+<th>Priority</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+
+</table>
+
+</div>
+
+<script>
+
+function addTask(){
+
+let task=document.getElementById("task").value;
+let priority=document.getElementById("priority").value;
+let status=document.getElementById("status").value;
+
+let table=document.getElementById("taskTable");
+
+let row=table.insertRow();
+
+row.insertCell(0).innerHTML=task;
+row.insertCell(1).innerHTML=priority;
+row.insertCell(2).innerHTML=status;
+
+let del=row.insertCell(3);
+del.innerHTML="<button onclick='deleteRow(this)'>Delete</button>";
+
+}
+
+function deleteRow(btn){
+let row=btn.parentNode.parentNode;
+row.parentNode.removeChild(row);
+}
+
+</script>
+
+</body>
+</html>
