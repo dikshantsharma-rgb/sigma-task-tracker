@@ -89,13 +89,46 @@ cursor:pointer;
 
 <script>
 
+<script>
+
+let tasks = [
+
+{task:"Leaflets distribution for first two weekends",priority:"High",status:"Pending"},
+{task:"Digital campaign planning (4-5L budget)",priority:"High",status:"Pending"},
+{task:"Portal listings (Magicbricks, 99acres)",priority:"High",status:"Pending"},
+{task:"Customer testimonial shoot with Dharmraj",priority:"Medium",status:"Pending"},
+{task:"Developer shoot arrangement mid-week",priority:"Medium",status:"Pending"},
+{task:"Referral scheme creatives (₹51,000 bonus)",priority:"High",status:"Pending"},
+{task:"Short reels videos (location, amenities, project highlights)",priority:"High",status:"Pending"},
+{task:"GMB listing SEO task for Phase 2",priority:"Medium",status:"Pending"},
+{task:"Search campaign (display network)",priority:"High",status:"Pending"},
+{task:"Influencer shortlist for sample flat shoot",priority:"Medium",status:"Pending"},
+{task:"BW app collaterals update (floor plans, renders)",priority:"High",status:"Pending"},
+{task:"Video templates for WhatsApp nurturing",priority:"Medium",status:"Pending"},
+{task:"YouTube branding walkthrough video",priority:"Medium",status:"Pending"},
+{task:"Drone shoot alignment",priority:"Medium",status:"Pending"},
+{task:"Align sales review weekly",priority:"Low",status:"Pending"}
+
+];
+
+let table=document.getElementById("taskTable");
+
+tasks.forEach(t=>{
+let row=table.insertRow();
+
+row.insertCell(0).innerHTML=t.task;
+row.insertCell(1).innerHTML=t.priority;
+row.insertCell(2).innerHTML=t.status;
+
+let del=row.insertCell(3);
+del.innerHTML="<button onclick='deleteRow(this)'>Delete</button>";
+});
+
 function addTask(){
 
 let task=document.getElementById("task").value;
 let priority=document.getElementById("priority").value;
 let status=document.getElementById("status").value;
-
-let table=document.getElementById("taskTable");
 
 let row=table.insertRow();
 
