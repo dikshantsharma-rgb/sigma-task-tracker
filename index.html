@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Sigma Task Tracker</title>
+
+<title>Sigma Centuria Task Tracker</title>
 
 <style>
 
@@ -12,32 +13,23 @@ padding:40px;
 }
 
 .container{
-max-width:900px;
+max-width:1000px;
 margin:auto;
 background:white;
-padding:20px;
+padding:25px;
 border-radius:10px;
-box-shadow:0 5px 10px rgba(0,0,0,0.1);
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
 }
 
 h1{
 text-align:center;
+margin-bottom:20px;
 }
 
 input,select,button{
 padding:10px;
 margin:5px;
-}
-
-table{
-width:100%;
-margin-top:20px;
-border-collapse:collapse;
-}
-
-th,td{
-padding:10px;
-border-bottom:1px solid #ddd;
+font-size:14px;
 }
 
 button{
@@ -47,6 +39,22 @@ border:none;
 border-radius:5px;
 cursor:pointer;
 }
+
+table{
+width:100%;
+margin-top:20px;
+border-collapse:collapse;
+}
+
+th,td{
+padding:12px;
+border-bottom:1px solid #ddd;
+text-align:left;
+}
+
+.high{color:red;font-weight:bold;}
+.medium{color:orange;}
+.low{color:green;}
 
 </style>
 
@@ -76,12 +84,16 @@ cursor:pointer;
 
 <table id="taskTable">
 
+<thead>
 <tr>
 <th>Task</th>
 <th>Priority</th>
 <th>Status</th>
 <th>Action</th>
 </tr>
+</thead>
+
+<tbody></tbody>
 
 </table>
 
@@ -89,9 +101,7 @@ cursor:pointer;
 
 <script>
 
-<script>
-
-let tasks = [
+let defaultTasks = [
 
 {task:"Leaflets distribution for first two weekends",priority:"High",status:"Pending"},
 {task:"Digital campaign planning (4-5L budget)",priority:"High",status:"Pending"},
@@ -107,44 +117,70 @@ let tasks = [
 {task:"Video templates for WhatsApp nurturing",priority:"Medium",status:"Pending"},
 {task:"YouTube branding walkthrough video",priority:"Medium",status:"Pending"},
 {task:"Drone shoot alignment",priority:"Medium",status:"Pending"},
-{task:"Align sales review weekly",priority:"Low",status:"Pending"}
+{task:"Weekly sales review alignment",priority:"Low",status:"Pending"}
 
 ];
 
-let table=document.getElementById("taskTable");
+let tasks = JSON.parse(localStorage.getItem("tasks"));
 
-tasks.forEach(t=>{
-let row=table.insertRow();
+if(!tasks){
+tasks = defaultTasks;
+saveTasks();
+}
 
-row.insertCell(0).innerHTML=t.task;
-row.insertCell(1).innerHTML=t.priority;
-row.insertCell(2).innerHTML=t.status;
+function saveTasks(){
+localStorage.setItem("tasks", JSON.stringify(tasks));
+}
 
-let del=row.insertCell(3);
-del.innerHTML="<button onclick='deleteRow(this)'>Delete</button>";
+function renderTasks(){
+
+let tableBody = document.querySelector("#taskTable tbody");
+tableBody.innerHTML = "";
+
+tasks.forEach((t,index)=>{
+
+let row = document.createElement("tr");
+
+row.innerHTML = `
+<td>${t.task}</td>
+<td>${t.priority}</td>
+<td>${t.status}</td>
+<td><button onclick="deleteTask(${index})">Delete</button></td>
+`;
+
+tableBody.appendChild(row);
+
 });
+
+}
 
 function addTask(){
 
-let task=document.getElementById("task").value;
-let priority=document.getElementById("priority").value;
-let status=document.getElementById("status").value;
+let task = document.getElementById("task").value;
+let priority = document.getElementById("priority").value;
+let status = document.getElementById("status").value;
 
-let row=table.insertRow();
+if(task==="") return;
 
-row.insertCell(0).innerHTML=task;
-row.insertCell(1).innerHTML=priority;
-row.insertCell(2).innerHTML=status;
+tasks.push({task,priority,status});
 
-let del=row.insertCell(3);
-del.innerHTML="<button onclick='deleteRow(this)'>Delete</button>";
+saveTasks();
+renderTasks();
+
+document.getElementById("task").value="";
 
 }
 
-function deleteRow(btn){
-let row=btn.parentNode.parentNode;
-row.parentNode.removeChild(row);
+function deleteTask(index){
+
+tasks.splice(index,1);
+
+saveTasks();
+renderTasks();
+
 }
+
+renderTasks();
 
 </script>
 
